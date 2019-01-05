@@ -1,10 +1,7 @@
 # 利用Bagging策略去改进决策树，构造集成树
 import numpy as np
-# import scipy as sp
 from sklearn import tree
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import precision_recall_curve
-from sklearn.metrics import classification_report
 from sklearn import datasets
 import matplotlib.pyplot as plt
 import pylab as pl
@@ -36,7 +33,7 @@ def createData(sizeoftest):
         if Y[i] == "yes" :
             Y[i] = 1
         else:
-            Y[i] = 0.5
+            Y[i] = 0
 
     #''''' 拆分训练数据与测试数据 '''
     x_train, x_test, y_train, y_test = train_test_split(X, Y,test_size=sizeoftest, random_state=0)
@@ -47,14 +44,12 @@ def DecisionTree(x_train,y_train,x_test, y_test):
     clf = tree.DecisionTreeClassifier(criterion='entropy')
     clf.fit(x_train, y_train)
     Yp = clf.predict(x_test)
-
     # ''''' 把决策树结构写入文件 '''
     with open("tree.dot", 'w') as f:
         f = tree.export_graphviz(clf, out_file=f)
     dot_data = tree.export_graphviz(clf, out_file=None)
     graph = pydotplus.graph_from_dot_data(dot_data)
     graph.write_pdf("西瓜数据3.0的决策树.pdf")
-
     return Yp
 
     # ''''' 系数反映每个特征的影响力。越大表示该特征在分类中起到的作用越大 '''
@@ -97,31 +92,30 @@ def count_list(X):
 
 # main
 if __name__ == '__main__':
-    # 生成数据集
+    ## 生成数据集
     # iris = datasets.load_iris()
     x_train, y_train, x_test, y_test = createData(0.4)
-
     print("真实值：")
     print(y_test)
-    # 决策树法
+
+    ## 决策树法
     Yp = []
     Yp = DecisionTree(x_train,y_train,x_test, y_test)
     print("决策树法：")
     print(Yp)
     result(y_test, Yp)
 
-    # Bagging改进决策树法
+    ## Bagging改进决策树法
     Yp_sub = []
     Yp_all = []
     Yp_bagging = []
     nSize = x_train.shape[0]
     nTestSize = y_test.shape[0]
-    M = 20            # 子模型个数
+    M = 20             # 子模型个数
     Percent = 0.632    # 每个子模型重复采样的百分比
     for i in range(M):
         Index = ReSampleforBagging(nSize, Percent)
         Yp_sub = DecisionTree(x_train[Index], y_train[Index], x_test, y_test)
-        # Yp_all = np.append(Yp_all,Yp_sub,axis = 0)
         Yp_all.append(Yp_sub.tolist())
     Yp_all = np.array(Yp_all)
     # 投票法确定集成输出
