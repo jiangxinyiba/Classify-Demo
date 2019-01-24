@@ -95,34 +95,54 @@ def createTree(dataSet, labels):
         myTree[bestFeatLabel][value] = createTree(splitDataSet(dataSet, bestFeat, value), subLabels)
     return myTree
 
+# 利用训练得到的决策树模型进行测试数据的预测
+def classify(inputTree,featLabels,testVec):
+    dictkey = list(inputTree.keys())
+    firstStr = dictkey[0]                   #获得第一个特征的名称
+    secondDict = inputTree[firstStr]        #取出其分支信息
+    featIndex = featLabels.index(firstStr)  #确定第一个特征的索引
+    key = testVec[featIndex]                #取得测试数据的第一个特征对应的数值
+    valueOfFeat = secondDict[key]           #获得训练树中该key对应的数值或树
+    if isinstance(valueOfFeat, dict):       #如果还是获得树，表示还需要继续去判断别的特征
+        classLabel = classify(valueOfFeat, featLabels, testVec)
+    else: classLabel = valueOfFeat          #否则表示该分支可以确定分类结果
+    return classLabel
+
 # 构造待分类数据集
 def createData():
     Data = [[1, 1, 'yes'], [1, 1, 'yes'], [1, 0, 'no'], [0, 1, 'no'], [0, 1, 'no']]
     Label = ['no sufacing', 'flippers']
-    Data = [[0, 0, 0, 0, 0, 0, 'yes'],
-            [1, 0, 1, 0, 0, 0, 'yes'],
+    Data = [[1, 0, 1, 0, 0, 0, 'yes'],
             [1, 0, 0, 0, 0, 0, 'yes'],
+            [0, 2, 2, 0, 2, 1, ' no'],
+            [2, 2, 2, 2, 2, 0, ' no'],
             [0, 0, 1, 0, 0, 0, 'yes'],
             [2, 0, 0, 0, 0, 0, 'yes'],
+            [0, 1, 0, 1, 0, 0, ' no'],
+            [1, 1, 1, 1, 1, 0, ' no'],
+            [2, 0, 0, 2, 2, 1, ' no'],
+            [0, 0, 0, 0, 0, 0, 'yes'],
+            [2, 1, 1, 1, 0, 0, ' no'],
             [0, 1, 0, 0, 1, 1, 'yes'],
             [1, 1, 0, 1, 1, 1, 'yes'],
             [1, 1, 0, 0, 1, 0, 'yes'],
-            [1, 1, 1, 1, 1, 0, ' no'],
-            [0, 2, 2, 0, 2, 1, ' no'],
-            [2, 2, 2, 2, 2, 0, ' no'],
-            [2, 0, 0, 2, 2, 1, ' no'],
-            [0, 1, 0, 1, 0, 0, ' no'],
-            [2, 1, 1, 1, 0, 0, ' no'],
             [1, 1, 0, 0, 1, 1, ' no'],
             [2, 0, 0, 2, 2, 0, ' no'],
             [0, 0, 1, 1, 1, 0, ' no']]
     Label = ['色泽','根蒂',"敲声","纹理","脐部","触感"]
     return Data, Label
 
+
+
 # main
 if __name__ == '__main__':
     Data, Label = createData()
-    r = chooseBestFeatureToSplit(Data)
-    #print(r)
+    # 构造决策树
     myTree = createTree(Data, Label)
     print(myTree)
+    # 用构造的决策树进行分类
+    Test = Data[16]
+    Xtest = Test[0:6]
+    Data, Label = createData()
+    Ypred = classify(myTree, Label, Xtest)
+    print(Ypred)
