@@ -16,9 +16,11 @@ A python demo which use ID3 algorithm for classification
 ## 修改说明如下：
 1. 部分代码按照python3的逻辑进行修改  
 2. 在colicTest函数中，基于当前数据的各列特征之间范围差距过大的问题，导致math.exp()无法求解，对训练数据进行归一化处理，其中归一化采用scikit中的preprocess库实现。  
-各梯度算法函数说明。  
+3. 各梯度算法函数说明。  
   gradAscent是梯度上升算法；  
   stocGradAscent0是普通的随机梯度上升算法，采用增量式更新权值，训练了所有的训练数据一遍；  
   stocGradAscent1是改进的随机梯度上升算法，进行了numIter次迭代，每次都是随机选取样本增量式更新权值,本函数用于马疝分类问题；  
   stocGradAscent1_gai改进的随机梯度上升算法，修改后可以展示每个权值的更新情况，本函数用于testSet.txt的数据分类展示。  
 # AdaBoost集成学习改进单层决策树
+这里按照《机器学习实战》第7章内容中代码进行简单修改后，符合python3的代码逻辑。  
+这里采用集成学习中的AdaBoost算法提升单层决策树的分类能力，通过集成50个较弱的单层决策树后，获得一个强分类器，将其应用于马疝数据集中，最后采用ROC图以及相应的AOC指标进行性能评估，代码分别用自己写的ROC代码和scikit库中的ROC代码进行分析。
